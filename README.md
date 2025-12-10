@@ -1,92 +1,245 @@
-# Authentication-API
-This is the authentication API by using Java + Spring boot + maven.
+# Authentication API
 
-## Getting Started
-In this section, you will find instructions on how to set up and run the Authentication API project.
+A secure RESTful Authentication API built with **Java** and **Spring Boot**, featuring JWT-based stateless authentication, user registration, login, and role-based access control.
 
-## Requirement
+## 📋 Table of Contents
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Requirements](#requirements)
+- [Getting Started](#getting-started)
+- [Configuration](#configuration)
+- [API Endpoints](#api-endpoints)
+- [Project Structure](#project-structure)
+- [Security](#security)
+- [Running Tests](#running-tests)
+- [Contributing](#contributing)
+- [License](#license)
 
-# Authentication-API
+## ✨ Features
 
-Lightweight Authentication API built with Java and Spring Boot, providing user registration, login, and JWT\-based stateless authentication.
+- ✅ **User Registration** - Secure user signup with password encryption
+- 🔐 **JWT Authentication** - Token-based stateless authentication
+- 🔒 **Spring Security Integration** - Role-based access control
+- 👤 **User Management** - Custom UserDetailsService implementation
+- 💾 **H2 Database** - In-memory database for development (easily switchable to production DB)
+- 🏥 **Health Check Endpoint** - Monitor API status
+- 🎨 **Web UI** - Static web interface included
+- 🔄 **RESTful API Design** - Clean and intuitive endpoints
 
-## Table of Contents
-- \#\# Features
-- \#\# Tech Stack
-- \#\# Requirements
-- \#\# Quick Start
-- \#\# Configuration
-- \#\# API Endpoints
-- \#\# Project Structure
-- \#\# Tests
-- \#\# Contributing
-- \#\# License
-- \#\# Repository
+## 🛠️ Tech Stack
 
-## Features
-- User registration and login with secure password hashing.
-- JWT access token issuance and validation.
-- Role\-based authorization-ready endpoints.
-- Health check endpoint for quick verification.
+- **Java**: 17
+- **Spring Boot**: 3.2.0
+- **Spring Security**: JWT-based authentication
+- **Spring Data JPA**: Data persistence layer
+- **H2 Database**: In-memory database (development)
+- **JWT (JJWT)**: JSON Web Token implementation
+- **Maven**: Dependency management and build tool
+- **Lombok**: Reduces boilerplate code
 
-## Tech Stack
-- Java 17+ (adjust to project `java.version`)
-- Spring Boot
-- Maven
-- JWT (library configurable)
-- H2 (in-memory) or PostgreSQL (configurable)
-- IntelliJ IDEA, Git / GitHub
+## 📦 Requirements
 
-## Requirements
-- JDK 17+ installed and `JAVA_HOME` configured.
-- Maven 3.6+
-- Windows (development environment)
+- **JDK 17** or higher
+- **Maven 3.6+**
+- **Git** (for version control)
 
-## Quick Start
-1. Clone the repository:
-   git clone `https://github.com/Het-2004/Authentication-API.git`
-2. Open in IntelliJ IDEA and set Project SDK to match `java.version` in `pom.xml`.
-3. Build:
-    mvn -U clean package
-4. Run (development):
-    mvn spring-boot:run
-5. Run the packaged jar:
-    java -jar target\auth-api-0.0.1-SNAPSHOT.jar
-6. Health check:
-   Visit `http://localhost:8080/` (default port) to verify the app responds.
+## 🚀 Getting Started
 
-## Configuration
-- Application properties are in `src/main/resources/application.properties` (or `application.yml`).
-- Common settings: server port, datasource URL/credentials, JWT secret and expiry.
-- Example (customize as needed):
-  - `server.port=8080`
-  - `spring.datasource.url=jdbc:postgresql://localhost:5432/dbname`
-  - `jwt.secret=your-secret-key`
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Het-2004/Authentication-API.git
+cd Authentication-API/auth-api
+```
 
-## API Endpoints (examples)
-- `GET /` — Health check (returns "OK")
-- `POST /api/auth/register` — Register new user (body: username, password, roles)
-- `POST /api/auth/login` — Authenticate and receive JWT (body: username, password)
-- Protected endpoints: require `Authorization: Bearer <token>`
+### 2. Build the Project
+```bash
+mvn clean install
+```
 
-Adjust paths to match your controllers.
+### 3. Run the Application
+```bash
+mvn spring-boot:run
+```
 
-## Project Structure
-- `src/main/java/...` — application code (controllers, services, repositories)
-- `src/main/resources` — configuration and static resources
-- `pom.xml` — Maven build and dependencies
+Or run the packaged JAR:
+```bash
+java -jar target/auth-api-0.0.1-SNAPSHOT.jar
+```
 
-## Tests
-- Run unit/integration tests:
-    mvn test
+### 4. Access the Application
+- **API Base URL**: `http://localhost:8080`
+- **H2 Console**: `http://localhost:8080/h2-console`
+  - JDBC URL: `jdbc:h2:mem:testdb`
+  - Username: `sa`
+  - Password: *(leave empty)*
+- **Web Interface**: `http://localhost:8080/index.html`
 
-## Contributing
-- Fork the repository, create a feature branch, add tests, and open a pull request.
-- Keep changes small and document configuration changes in `application.properties`.
+## ⚙️ Configuration
 
-## License
-- Add your chosen license file at project root (e.g., `LICENSE`).
+The application is configured in `src/main/resources/application.properties`:
 
-## Repository
-- Remote: `https://github.com/Het-2004/Authentication-API.git`
-- Branch: `master`
+```properties
+# Server Configuration
+server.port=8080
+
+# Database Configuration (H2 In-Memory)
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.username=sa
+spring.datasource.password=
+
+# JPA Configuration
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+# H2 Console
+spring.h2.console.enabled=true
+
+# JWT Configuration
+app.jwt.secret=MySuperSecretKeyForJwtDontUseInProd123
+app.jwt.expiration-ms=3600000  # 1 hour
+```
+
+> ⚠️ **Important**: Change the JWT secret before deploying to production!
+
+## 📡 API Endpoints
+
+### Public Endpoints
+
+#### Health Check
+```http
+GET /
+GET /api/hello
+```
+Returns: Health status message
+
+#### Register User
+```http
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "username": "john_doe",
+  "email": "john@example.com",
+  "password": "securePassword123"
+}
+```
+Returns: JWT token in `AuthResponse`
+
+#### Login
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "username": "john_doe",
+  "password": "securePassword123"
+}
+```
+Returns: JWT token in `AuthResponse`
+
+### Protected Endpoints
+
+All protected endpoints require JWT token in the Authorization header:
+```http
+Authorization: Bearer <your-jwt-token>
+```
+
+#### Demo Protected Endpoint
+```http
+GET /api/demo
+Authorization: Bearer <token>
+```
+
+## 📁 Project Structure
+
+```
+auth-api/
+├── src/
+│   ├── main/
+│   │   ├── java/com/example/authapi/
+│   │   │   ├── AuthApiApplication.java       # Main application class
+│   │   │   ├── HealthController.java         # Health check endpoint
+│   │   │   ├── auth/                          # Authentication module
+│   │   │   │   ├── AuthController.java        # Register & Login endpoints
+│   │   │   │   ├── AuthService.java           # Authentication logic
+│   │   │   │   ├── AuthRequest.java           # Login DTO
+│   │   │   │   ├── AuthResponse.java          # JWT response DTO
+│   │   │   │   └── RegisterRequest.java       # Registration DTO
+│   │   │   ├── demo/                           # Demo protected endpoints
+│   │   │   │   └── HelloController.java
+│   │   │   ├── security/                       # Security configuration
+│   │   │   │   ├── SecurityConfig.java         # Spring Security config
+│   │   │   │   ├── JwtService.java             # JWT utilities
+│   │   │   │   ├── JwtAuthenticationFilter.java # JWT filter
+│   │   │   │   └── CustomUserDetailsService.java
+│   │   │   └── user/                           # User entity & repository
+│   │   │       ├── User.java
+│   │   │       └── UserRepository.java
+│   │   └── resources/
+│   │       ├── application.properties          # App configuration
+│   │       └── static/                          # Web UI files
+│   │           ├── index.html
+│   │           ├── css/styles.css
+│   │           └── js/app.js
+│   └── test/                                    # Test classes
+│       └── java/com/example/authapi/
+│           └── AuthApiApplicationTests.java
+├── pom.xml                                      # Maven configuration
+└── README.md
+```
+
+## 🔐 Security
+
+- **Password Encryption**: BCrypt hashing algorithm
+- **JWT Tokens**: Stateless authentication with configurable expiration
+- **Spring Security**: Fine-grained access control
+- **CORS**: Configurable cross-origin resource sharing
+- **HTTP Security**: CSRF protection (configurable)
+
+### Security Features:
+- User passwords are never stored in plain text
+- JWT tokens expire after 1 hour (configurable)
+- All protected endpoints require valid authentication
+- Custom authentication filter for JWT validation
+
+## 🧪 Running Tests
+
+Execute the test suite:
+```bash
+mvn test
+```
+
+Run with coverage:
+```bash
+mvn clean test jacoco:report
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/AmazingFeature`)
+3. **Commit** your changes (`git commit -m 'Add some AmazingFeature'`)
+4. **Push** to the branch (`git push origin feature/AmazingFeature`)
+5. **Open** a Pull Request
+
+### Guidelines:
+- Follow Java coding conventions
+- Write meaningful commit messages
+- Add tests for new features
+- Update documentation as needed
+
+## 📄 License
+
+This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
+
+## 📞 Contact & Links
+
+- **Repository**: [https://github.com/Het-2004/Authentication-API](https://github.com/Het-2004/Authentication-API)
+- **Author**: Het-2004
+- **Branch**: master
+
+---
+
+Made with ❤️ using Spring Boot
